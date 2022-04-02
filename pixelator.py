@@ -24,6 +24,12 @@ class color(Enum):
     WHITE = ImageColor.getrgb("#ffffffff")
 
 all_colors = color.__members__.values()
+weights = {'R': 1.0, 'G': 1.0, 'B': 1.0, 'A': 1.0}
+
+def user_change_weights():
+    global weights
+    for key in weights.keys():
+        weights[key] = get_user_float(f"New weight for channel \'{key}\': ")
 
 def get_user_img_size(bounds_x: tuple = (0, float("inf")), bounds_y: tuple = (0, float("inf"))) -> tuple:
     tgt_dims = ("width", "height")
@@ -50,6 +56,15 @@ def get_user_int(prompt: str) -> int:
             continue
         return user_in
 
+def get_user_float(prompt: str) -> float:
+    while(True):
+        try:
+            user_in = float(input(prompt))
+        except ValueError as ve:
+            print(f"Invalid input: {ve}")
+            continue
+        return user_in
+
 def get_user_bool(prompt: str) -> bool:
     return input(prompt).upper() == 'Y'
 
@@ -65,11 +80,12 @@ def color_closest(source: list) -> list:
     min_dist = float('INF')
     best_color = source
     global all_colors
+    global weights
     for colorrr in all_colors:
         colorr = colorrr.value
         distance = 0
         for i in range(len(source)):
-            distance += (colorr[i]-source[i])**2
+            distance += ((colorr[i]-source[i])*list(weights.values())[i])**2
         distance = distance**0.5
         if distance < min_dist:
             min_dist = distance
@@ -132,6 +148,7 @@ def main():
     px = rplace_image(file)
     #size = get_user_img_size((0, px.x-1), (0, px.y-1))
     #out = px.pixelate(size[0], size[1])
+    # get color restrictions
     if get_user_bool("Specify color restrictions? Y/N: "):
         print("Possible colors: ")
         print([colorr.name for colorr in color], sep=", ")
@@ -148,6 +165,9 @@ def main():
             except KeyError as ke:
                 print(f"Invalid color \"{c_filter}\": {ke}")
                 continue
+    if get_user_bool("Specify color channel weights? Y/N: "):
+        print("Input RGBA color weights (note: Alpha channel not applicable to all images): ")
+        user_change_weights()
     # get sizes
     sizes = input("Square sizes (int), separated by comma: ")
     sizes = sizes.strip().split(',')
