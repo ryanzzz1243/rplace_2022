@@ -6,22 +6,22 @@ from PIL import ImageColor
 from os.path import exists
 
 class color(Enum):
-    RED = ImageColor.getrgb("#ff4500")
-    ORANGE = ImageColor.getrgb("#ffa800")
-    YELLOW = ImageColor.getrgb("#ffd635")
-    GREEN = ImageColor.getrgb("#00a368")
-    LIME = ImageColor.getrgb("#7eed56")
-    DBLUE = ImageColor.getrgb("#2450a4")
-    BLUE = ImageColor.getrgb("#3690ea")
-    LBLUE = ImageColor.getrgb("#51e9f4")
-    DPURPLE = ImageColor.getrgb("#811e9f")
-    PURPLE = ImageColor.getrgb("#b44ac0")
-    PINK = ImageColor.getrgb("#ff99aa")
-    BROWN = ImageColor.getrgb("#9c6926")
-    BLACK = ImageColor.getrgb("#000000")
-    DGREY = ImageColor.getrgb("#898d90")
-    LGREY = ImageColor.getrgb("#d4d7d9")
-    WHITE = ImageColor.getrgb("#ffffff")
+    RED = ImageColor.getrgb("#ff4500ff")
+    ORANGE = ImageColor.getrgb("#ffa800ff")
+    YELLOW = ImageColor.getrgb("#ffd635ff")
+    GREEN = ImageColor.getrgb("#00a368ff")
+    LIME = ImageColor.getrgb("#7eed56ff")
+    DBLUE = ImageColor.getrgb("#2450a4ff")
+    BLUE = ImageColor.getrgb("#3690eaff")
+    LBLUE = ImageColor.getrgb("#51e9f4ff")
+    DPURPLE = ImageColor.getrgb("#811e9fff")
+    PURPLE = ImageColor.getrgb("#b44ac0ff")
+    PINK = ImageColor.getrgb("#ff99aaff")
+    BROWN = ImageColor.getrgb("#9c6926ff")
+    BLACK = ImageColor.getrgb("#000000ff")
+    DGREY = ImageColor.getrgb("#898d90ff")
+    LGREY = ImageColor.getrgb("#d4d7d9ff")
+    WHITE = ImageColor.getrgb("#ffffffff")
 
 all_colors = color.__members__.values()
 
@@ -60,17 +60,6 @@ def get_user_file(prompt: str) -> str:
 def get_file(file_loc: str) -> str:
     if exists(file_loc):
         return file_loc
-
-def color_closest(source: str) -> tuple:
-    try:
-        convert_tuple = (source[:2], source[2:4], source[4:5])
-    except IndexError as ie:
-        print(ie)
-        return None
-    return color_closest(convert_tuple)
-
-def color_closest(source: list) -> tuple:
-    return color_closest(tuple(source))
     
 def color_closest(source: list) -> list:
     min_dist = float('INF')
@@ -79,7 +68,7 @@ def color_closest(source: list) -> list:
     for colorrr in all_colors:
         colorr = colorrr.value
         distance = 0
-        for i in range(len(colorr)):
+        for i in range(len(source)):
             distance += (colorr[i]-source[i])**2
         distance = distance**0.5
         if distance < min_dist:
