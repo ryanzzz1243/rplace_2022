@@ -6,25 +6,37 @@ from PIL import Image
 from PIL import ImageColor
 from os.path import exists
 
-class color(Enum):
-    RED = ImageColor.getrgb("#ff4500ff")
-    ORANGE = ImageColor.getrgb("#ffa800ff")
-    YELLOW = ImageColor.getrgb("#ffd635ff")
-    GREEN = ImageColor.getrgb("#00a368ff")
-    LIME = ImageColor.getrgb("#7eed56ff")
-    DBLUE = ImageColor.getrgb("#2450a4ff")
-    BLUE = ImageColor.getrgb("#3690eaff")
-    LBLUE = ImageColor.getrgb("#51e9f4ff")
-    DPURPLE = ImageColor.getrgb("#811e9fff")
-    PURPLE = ImageColor.getrgb("#b44ac0ff")
-    PINK = ImageColor.getrgb("#ff99aaff")
-    BROWN = ImageColor.getrgb("#9c6926ff")
-    BLACK = ImageColor.getrgb("#000000ff")
-    DGREY = ImageColor.getrgb("#898d90ff")
-    LGREY = ImageColor.getrgb("#d4d7d9ff")
-    WHITE = ImageColor.getrgb("#ffffffff")
+color = {
+    "DarkRed": "#be0039ff",
+    "Red": "#ff4500ff",
+    "Orange": "#ffa800ff",
+    "Yellow": "#ffd635ff",
+    "DarkGreen": "#00a368ff",
+    "Green": "#00cc78ff",
+    "LightGreen": "#00cc78ff",
+    "DarkTeal": "#00756fff",
+    "Teal": "#009eaaff",
+    "DarkBlue": "#2450a4ff",
+    "Blue": "#3690eaff",
+    "LightBlue": "#51e9f4ff",
+    "Indigo": "#493ac1ff",
+    "Periwinkle": "#6a5cffff",
+    "DarkPurple": "#811e9fff",
+    "Purple": "#b44ac0ff",
+    "Pink": "#ff3881ff",
+    "LightPink": "#ff99aaff",
+    "DarkBrown": "#6d482fff",
+    "Brown": "#9c6926ff",
+    "Black": "#000000ff",
+    "DarkGrey": "#898d90ff",
+    "LightGrey": "#d4d7d9ff",
+    "White": "#ffffffff"
+}
 
-all_colors = color.__members__.values()
+for key in color.keys():
+    color[key] = ImageColor.getrgb(color[key])
+
+all_colors = list(color.values())
 weights = {'R': 1.0, 'G': 1.0, 'B': 1.0, 'A': 1.0}
 
 def user_change_weights():
@@ -83,8 +95,7 @@ def color_closest(source: list) -> list:
     global all_colors
     global weights
     weightss = list(weights.values())
-    for colorrr in all_colors:
-        colorr = colorrr.value
+    for colorr in all_colors:
         distance = 0
         for i in range(len(source)):
             distance += ((colorr[i]-source[i])*(1/weightss[i]))**2
@@ -153,7 +164,7 @@ def main():
     # get color restrictions
     if get_user_bool("Specify color restrictions? Y/N: "):
         print("Possible colors: ")
-        print([colorr.name for colorr in color], sep=", ")
+        print(list(color.keys()), sep=", ")
         print("Specify the colors to allow by name sperated by commas: ")
         color_filter_user = input()
         color_filters = [f"{value.lstrip().strip()}" for value in color_filter_user.upper().split(',')]
