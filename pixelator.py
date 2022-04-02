@@ -1,5 +1,6 @@
-from enum import Enum
+import time
 import numpy as np
+from enum import Enum
 from multiprocessing.sharedctypes import Value
 from PIL import Image
 from PIL import ImageColor
@@ -81,11 +82,12 @@ def color_closest(source: list) -> list:
     best_color = source
     global all_colors
     global weights
+    weightss = list(weights.values())
     for colorrr in all_colors:
         colorr = colorrr.value
         distance = 0
         for i in range(len(source)):
-            distance += ((colorr[i]-source[i])*list(weights.values())[i])**2
+            distance += ((colorr[i]-source[i])*(1/weightss[i]))**2
         distance = distance**0.5
         if distance < min_dist:
             min_dist = distance
@@ -166,7 +168,8 @@ def main():
                 print(f"Invalid color \"{c_filter}\": {ke}")
                 continue
     if get_user_bool("Specify color channel weights? Y/N: "):
-        print("Input RGBA color weights (note: Alpha channel not applicable to all images): ")
+        print("Note: Alpha channel not applicable to all images")
+        print("Input RGBA color weights: ")
         user_change_weights()
     # get sizes
     sizes = input("Square sizes (int), separated by comma: ")
@@ -179,8 +182,11 @@ def main():
             continue
     sizes = [value for value in sizes if type(value) == int]
     outs = list()
+    start = time.time()
     for size in sizes:
         outs.append(px.pixelate_square(size))
+    end = time.time()
+    print(f"Rendered {len(outs)} images in {(end-start)*1000:.1f} ms")
     out_path = input("Name to save to (do not include extension): ")
     for index, out in enumerate(outs):
         out.save(f"img/{out_path}-{index}.{(px.img.format).lower()}", format=px.img.format)
