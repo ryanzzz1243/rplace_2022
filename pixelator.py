@@ -174,7 +174,7 @@ def main():
         outs.append(px.pixelate_square(size))
     out_path = input("Name to save to (do not include extension): ")
     for index, out in enumerate(outs):
-        out.save(f"{out_path}-{index}.{(px.img.format).lower()}", format=px.img.format)
+        out.save(f"img/{out_path}-{index}.{(px.img.format).lower()}", format=px.img.format)
 
 if __name__ == "__main__":
     main()
