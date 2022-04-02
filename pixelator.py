@@ -73,7 +73,7 @@ def color_closest(source: list) -> list:
         distance = distance**0.5
         if distance < min_dist:
             min_dist = distance
-            best_color = colorr
+            best_color = colorr[:len(source)]
     return best_color
 
 class rplace_image:
@@ -149,7 +149,7 @@ def main():
                 print(f"Invalid color \"{c_filter}\": {ke}")
                 continue
     # get sizes
-    sizes = input("Square sizes, separated by comma: ")
+    sizes = input("Square sizes (int), separated by comma: ")
     sizes = sizes.strip().split(',')
     for index, size in enumerate(sizes):
         try:
