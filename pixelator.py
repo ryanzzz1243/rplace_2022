@@ -198,7 +198,7 @@ def main():
     print(f"Rendered {len(outs)} images in {(end-start)*1000:.1f} ms")
     out_path = input("Name to save to (do not include extension): ")
     for index, out in enumerate(outs):
-        out.save(f"img/{out_path}-{index}.{(px.img.format).lower()}", format=px.img.format)
+        out.save(f"img/{out_path}-{index}.png", format='PNG')
 
 if __name__ == "__main__":
     main()
