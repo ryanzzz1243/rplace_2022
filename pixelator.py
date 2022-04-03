@@ -1,7 +1,6 @@
 import time
 import numpy as np
 from enum import Enum
-from multiprocessing.sharedctypes import Value
 from PIL import Image
 from PIL import ImageColor
 from os.path import exists
