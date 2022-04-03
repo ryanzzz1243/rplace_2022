@@ -33,9 +33,11 @@ excel_color = {
     "White": "ffffff"
 }
 
-main_color = {key: ImageColor.getrgb(f"#{value}ff") for key, value in excel_color.items()}
+main_color = {key.upper(): ImageColor.getrgb(f"#{value}ff") for key, value in excel_color.items()}
+main_color["BLANK"] = ImageColor.getrgb("#00000000")
 inverse_color = {value: key for key, value in main_color.items()}
-excel_color = {key: f"ff{value}" for key, value in excel_color.items()}
+excel_color = {key.upper(): f"ff{value}" for key, value in excel_color.items()}
+excel_color["BLANK"] = "00000000"
 
 all_colors = list(main_color.values())
 weights = {'R': 1.0, 'G': 1.0, 'B': 1.0, 'A': 1.0}
@@ -96,6 +98,11 @@ def color_closest(source: list) -> list:
     global all_colors
     global weights
     weightss = list(weights.values())
+    try:
+        if source[3] == 0:
+            return source[3]
+    except IndexError:
+        pass
     for colorr in all_colors:
         distance = 0
         for i in range(len(source)):
