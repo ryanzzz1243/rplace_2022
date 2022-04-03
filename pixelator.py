@@ -1,40 +1,43 @@
 import time
 import numpy as np
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill, Color
 from PIL import Image
 from PIL import ImageColor
 from os.path import exists
 
-color = {
-    "DarkRed": "#be0039ff",
-    "Red": "#ff4500ff",
-    "Orange": "#ffa800ff",
-    "Yellow": "#ffd635ff",
-    "DarkGreen": "#00a368ff",
-    "Green": "#00cc78ff",
-    "LightGreen": "#00cc78ff",
-    "DarkTeal": "#00756fff",
-    "Teal": "#009eaaff",
-    "DarkBlue": "#2450a4ff",
-    "Blue": "#3690eaff",
-    "LightBlue": "#51e9f4ff",
-    "Indigo": "#493ac1ff",
-    "Periwinkle": "#6a5cffff",
-    "DarkPurple": "#811e9fff",
-    "Purple": "#b44ac0ff",
-    "Pink": "#ff3881ff",
-    "LightPink": "#ff99aaff",
-    "DarkBrown": "#6d482fff",
-    "Brown": "#9c6926ff",
-    "Black": "#000000ff",
-    "DarkGrey": "#898d90ff",
-    "LightGrey": "#d4d7d9ff",
-    "White": "#ffffffff"
+excel_color = {
+    "DarkRed": "be0039",
+    "Red": "ff4500",
+    "Orange": "ffa800",
+    "Yellow": "ffd635",
+    "DarkGreen": "00a368",
+    "Green": "00cc78",
+    "LightGreen": "00cc78",
+    "DarkTeal": "00756f",
+    "Teal": "009eaa",
+    "DarkBlue": "2450a4",
+    "Blue": "3690ea",
+    "LightBlue": "51e9f4",
+    "Indigo": "493ac1",
+    "Periwinkle": "6a5cff",
+    "DarkPurple": "811e9f",
+    "Purple": "b44ac0",
+    "Pink": "ff3881",
+    "LightPink": "ff99aa",
+    "DarkBrown": "6d482f",
+    "Brown": "9c6926",
+    "Black": "000000",
+    "DarkGrey": "898d90",
+    "LightGrey": "d4d7d9",
+    "White": "ffffff"
 }
 
-for key in color.keys():
-    color[key] = ImageColor.getrgb(color[key])
+main_color = {key: ImageColor.getrgb(f"#{value}ff") for key, value in excel_color.items()}
+inverse_color = {value: key for key, value in main_color.items()}
+excel_color = {key: f"ff{value}" for key, value in excel_color.items()}
 
-all_colors = list(color.values())
+all_colors = list(main_color.values())
 weights = {'R': 1.0, 'G': 1.0, 'B': 1.0, 'A': 1.0}
 
 def user_change_weights():
@@ -113,12 +116,7 @@ class rplace_image:
         self.img = IMG
         self.x = IMG.size[0]
         self.y = IMG.size[1]
-        '''img_np = np.asarray(IMG)
-        # Preprocess image to avoid rolling errors.
-        for x in range(self.x):
-            for y in range(self.y):
-                img_np[y][x] = color_closest(img_np[y][x])
-        self.img = Image.fromarray(img_np)'''
+        self.outs = dict()
 
     def pixelate(self, x_size: int, y_size: int):
         src_w, src_h = self.img.size
@@ -147,7 +145,7 @@ class rplace_image:
                 avg_color = color_closest([item//count for item in avg_color]) # average rgb values
                 tgt_img[y_tgt][x_tgt] = avg_color
         tgt_out = Image.fromarray(tgt_img)
-        return tgt_out
+        self.outs[f"{x_size}x{y_size}"] = tgt_out
 
     def pixelate_square(self, square: int):
         return self.pixelate(self.x / square, self.y / square)
@@ -162,7 +160,7 @@ def main():
     # get color restrictions
     if get_user_bool("Specify color restrictions? Y/N: "):
         print("Possible colors: ")
-        print(list(color.keys()), sep=", ")
+        print(list(main_color.keys()), sep=", ")
         print("Specify the colors to allow by name sperated by commas: ")
         color_filter_user = input()
         color_filters = [f"{value.lstrip().strip()}" for value in color_filter_user.upper().split(',')]
@@ -172,7 +170,7 @@ def main():
         all_colors = list()
         for c_filter in color_filters:
             try:
-                all_colors.append(color[c_filter])
+                all_colors.append(main_color[c_filter])
             except KeyError as ke:
                 print(f"Invalid color \"{c_filter}\": {ke}")
                 continue
@@ -190,15 +188,29 @@ def main():
             print(f"Invalid size in your input: {ve}")
             continue
     sizes = [value for value in sizes if type(value) == int]
-    outs = list()
     start = time.time()
     for size in sizes:
-        outs.append(px.pixelate_square(size))
+        px.pixelate_square(size)
     end = time.time()
-    print(f"Rendered {len(outs)} images in {(end-start)*1000:.1f} ms")
+    print(f"Rendered {len(px.outs)} images in {(end-start)*1000:.1f} ms")
     out_path = input("Name to save to (do not include extension): ")
-    for index, out in enumerate(outs):
-        out.save(f"img/{out_path}-{index}.png", format='PNG')
+    if excel := get_user_bool(f"Output to Excel? Y/N: "):
+        count = 0
+        wb = Workbook()
+        wb.remove(wb.active)
+        for key, img in px.outs.items():
+            img_ar = np.asarray(img)
+            ws = wb.create_sheet(f"{count}-{key}")
+            for row in range(len(img_ar)):
+                for column in range(len(img_ar[0])):
+                    colour = Color(excel_color[inverse_color[tuple(img_ar[row][column])]])
+                    fill = PatternFill(fill_type='solid', fgColor=colour)
+                    ws.cell(row=row+1, column=column+1).fill = fill
+            count += 1
+    for key, out in px.outs.items():
+        out.save(f"img/{out_path}-{key}.png", format='PNG')
+    if excel:
+        wb.save(f"img/{out_path}.xlsx")
 
 if __name__ == "__main__":
     main()
