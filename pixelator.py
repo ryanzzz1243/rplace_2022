@@ -7,37 +7,45 @@ from PIL import ImageColor
 from os.path import exists
 
 excel_color = {
+    "Burgundy": "6d001a",
     "DarkRed": "be0039",
     "Red": "ff4500",
     "Orange": "ffa800",
     "Yellow": "ffd635",
+    "PaleYellow": "fff8b8",
     "DarkGreen": "00a368",
     "Green": "00cc78",
     "LightGreen": "00cc78",
     "DarkTeal": "00756f",
     "Teal": "009eaa",
+    "LightTeal": "00ccc0",
     "DarkBlue": "2450a4",
     "Blue": "3690ea",
     "LightBlue": "51e9f4",
     "Indigo": "493ac1",
     "Periwinkle": "6a5cff",
+    "Lavender": "94b3ff",
     "DarkPurple": "811e9f",
     "Purple": "b44ac0",
+    "PalePurple": "e4abff",
+    "Magenta": "de107f",
     "Pink": "ff3881",
     "LightPink": "ff99aa",
     "DarkBrown": "6d482f",
     "Brown": "9c6926",
+    "Beige": "ffb470",
     "Black": "000000",
-    "DarkGrey": "898d90",
+    "DarkGrey": "515252",
+    "Grey": "898d90",
     "LightGrey": "d4d7d9",
     "White": "ffffff"
 }
 
 main_color = {key.upper(): ImageColor.getrgb(f"#{value}ff") for key, value in excel_color.items()}
-main_color["BLANK"] = ImageColor.getrgb("#00000000")
+main_color["BLANK"] = ImageColor.getrgb("#ffffff00")
 inverse_color = {value: key for key, value in main_color.items()}
 excel_color = {key.upper(): f"ff{value}" for key, value in excel_color.items()}
-excel_color["BLANK"] = "00000000"
+excel_color["BLANK"] = "00ffffff"
 
 all_colors = list(main_color.values())
 weights = {'R': 1.0, 'G': 1.0, 'B': 1.0, 'A': 1.0}
