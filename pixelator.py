@@ -15,7 +15,7 @@ excel_color = {
     "PaleYellow": "fff8b8",
     "DarkGreen": "00a368",
     "Green": "00cc78",
-    "LightGreen": "00cc78",
+    "LightGreen": "7eed56",
     "DarkTeal": "00756f",
     "Teal": "009eaa",
     "LightTeal": "00ccc0",
@@ -108,7 +108,7 @@ def color_closest(source: list) -> list:
     weightss = list(weights.values())
     try:
         if source[3] == 0:
-            return source[3]
+            return main_color["BLANK"]
     except IndexError:
         pass
     for colorr in all_colors:
@@ -118,7 +118,7 @@ def color_closest(source: list) -> list:
         distance = distance**0.5
         if distance < min_dist:
             min_dist = distance
-            best_color = colorr[:len(source)]
+            best_color = colorr
     return best_color
 
 class rplace_image:
@@ -140,7 +140,7 @@ class rplace_image:
         w_offset = round(src_w / x_size)
         h_offset = round(src_h / y_size)
         src_img = np.asarray(self.img)
-        tgt_img = np.empty(shape=(y_size, x_size, len(src_img[0][0])), dtype=src_img.dtype)
+        tgt_img = np.empty(shape=(y_size, x_size, 4), dtype=src_img.dtype)
         for x_tgt in range(0, x_size):
             for y_tgt in range(0, y_size):
                 avg_color = [0]*len(self.img.mode)
